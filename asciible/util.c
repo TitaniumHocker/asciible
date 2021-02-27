@@ -1,13 +1,16 @@
 #include <stdio.h>
-#include <getopt.h>
+#include <unistd.h>
 #include <stdbool.h>
+#include <errno.h>
+#include <getopt.h>
+
 
 #include "util.h"
 
 const char* USAGE_TEMPLATE =
   "Usage: %s [TEXT] [-i|--input FILE|DIR...] [-r|--recursive] "
   "[-h|-?|--help] [--version] [-v|--verbose]\n";
-const char* VERSION_TEMPLATE = "%s version %s";
+const char* VERSION_TEMPLATE = "%s version %s\n";
 const char* HELP_TEMPLATE =
   "Usage: %s [-i|--input FILE|DIR...] [-r|--recursive] "
   "[-h|-?|--help] [--version] [-v|--verbose] [TEXT]\n"
@@ -16,15 +19,14 @@ const char* HELP_TEMPLATE =
   "text, file or files in directory has non-ASCII symbols.\n"
   "If at least one non-ASCII symbol was detected returns non-zero "
   "exit code, otherwise - zero exit code.\n"
-  "If non test nor files or dirs with files provided - returns "
+  "If non text nor files or dirs with files provided - returns "
   "non-zero exit code.\n"
   "\n"
   "Options:\n"
   "\t-r|--recursive       Used for recursive check in directory.\n"
-  "\t-h|-?|--help         Show help and exit.\n"
+  "\t-h|--help         Show help and exit.\n"
   "\t--version            Show version and exit.\n"
   "\t-v|--verbose         Show verbose output.\n"
-  "\t-q|--quiet           Don't show output.\n"
   "\n"
   "Arguments:\n"
   "\tTEXT                 Provided text for check.\n"
@@ -33,27 +35,29 @@ const char* HELP_TEMPLATE =
   "The author of the program, as always, bears no responsibility.\n";
 
 
-void pusage(char* program_name) {
+void pusage(const char* program_name)
+{
   printf(USAGE_TEMPLATE, program_name);
 }
 
-void pversion(char* program_name, const char* version) {
+void pversion(const char* program_name, const char* version)
+{
   printf(VERSION_TEMPLATE, program_name, version);
 }
 
-void phelp(char* program_name) {
+void phelp(const char* program_name)
+{
   printf(HELP_TEMPLATE, program_name);
 }
 
-void do_nothing(char* message) {};
 
-void verbose_print(char* message) {
-  printf("Verbose log: %s\n", message);
-}
-
-func make_logger(int verbose) {
-  if (!verbose) {
-    return do_nothing;
-  }
-  return verbose_print;
+bool isAccessable(char* path, char* errbuf)
+{
+  if (access(path, R_OK) == 0)
+    return true;
+  if (errno == ENOENT)
+    errbuf = "No such file or directory";
+  if (errno == EACCES)
+    errbuf = "Permission denied";
+  return false;
 }

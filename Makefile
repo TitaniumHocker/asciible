@@ -19,4 +19,8 @@ clean:
 	rm -rf build
 
 install: $(BUILD_DIR)/$(BIN_NAME)
-	cp $^ /bin/
+	cp $^ /usr/bin/
+
+
+test: $(BUILD_DIR)/$(BIN_NAME)
+	./tests/run $(realpath $^)
