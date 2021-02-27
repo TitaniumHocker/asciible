@@ -1,6 +1,8 @@
 #include <stdio.h>
-#include "util.h"
+#include <getopt.h>
+#include <stdbool.h>
 
+#include "util.h"
 
 const char* USAGE_TEMPLATE =
   "Usage: %s [TEXT] [-i|--input FILE|DIR...] [-r|--recursive] "
@@ -22,6 +24,7 @@ const char* HELP_TEMPLATE =
   "\t-h|-?|--help         Show help and exit.\n"
   "\t--version            Show version and exit.\n"
   "\t-v|--verbose         Show verbose output.\n"
+  "\t-q|--quiet           Don't show output.\n"
   "\n"
   "Arguments:\n"
   "\tTEXT                 Provided text for check.\n"
@@ -40,4 +43,17 @@ void pversion(char* program_name, const char* version) {
 
 void phelp(char* program_name) {
   printf(HELP_TEMPLATE, program_name);
+}
+
+void do_nothing(char* message) {};
+
+void verbose_print(char* message) {
+  printf("Verbose log: %s\n", message);
+}
+
+func make_logger(int verbose) {
+  if (!verbose) {
+    return do_nothing;
+  }
+  return verbose_print;
 }

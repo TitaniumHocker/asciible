@@ -6,7 +6,7 @@ BUILD_DIR=build
 BIN_NAME=asciible
 
 all: $(BUILD_DIR)/$(BIN_NAME)
-	chmod +x $^
+	chmod a+x $^
 
 $(BUILD_DIR)/$(BIN_NAME): $(SOURCE_DIR)/main.c $(BUILD_DIR)/util.o
 	$(CC) $(CFLAGS) -o $@ $^
